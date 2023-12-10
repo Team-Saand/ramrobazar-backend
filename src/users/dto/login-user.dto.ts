@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
 export class LoginUserDto {
   @IsNotEmpty()
+  @IsPhoneNumber('NP', { message: 'Only nepali numbers are allowed' })
   @ApiProperty()
-  email: string;
+  phone: string;
 
   @IsNotEmpty()
   @ApiProperty()

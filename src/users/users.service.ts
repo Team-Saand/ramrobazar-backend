@@ -21,18 +21,18 @@ export class UsersService {
     return user;
   }
 
-  async findOneUser(email: string): Promise<Users> {
+  async findOneUser(phone: string): Promise<Users> {
     return this.usersRepository.findOne({
       where: {
-        email,
+        phone,
       },
     });
   }
 
-  async getUserWithPassword(email: string): Promise<Users> {
+  async getUserWithPassword(phone: string): Promise<Users> {
     return this.usersRepository
       .createQueryBuilder('user')
-      .where('user.email = :email', { email })
+      .where('user.phone = :phone', { phone })
       .addSelect('user.password')
       .getOne();
   }
@@ -42,15 +42,15 @@ export class UsersService {
     return bcrypt.hash(password, salt);
   }
 
-  async updateUser(email: string, body: UpdateUserDto): Promise<Users> {
-    const user = await this.findOneUser(email);
+  async updateUser(phone: string, body: UpdateUserDto): Promise<Users> {
+    const user = await this.findOneUser(phone);
     Object.assign(user, body);
 
     return this.usersRepository.save(user);
   }
 
-  async updateProfilePicture(email: string, filename: string): Promise<Users> {
-    const user = await this.findOneUser(email);
+  async updateProfilePicture(phone: string, filename: string): Promise<Users> {
+    const user = await this.findOneUser(phone);
     if (user) {
       user.photo_url = filename;
 

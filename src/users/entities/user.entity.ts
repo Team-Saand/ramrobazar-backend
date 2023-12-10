@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { GenderEnum } from '../enums';
 
 @Entity()
 export class Users {
@@ -7,6 +8,9 @@ export class Users {
 
   @Column({ unique: true, nullable: false })
   email: string;
+
+  @Column({ nullable: false, unique: true })
+  phone: string;
 
   @Column({ nullable: false, select: false })
   password: string;
@@ -17,8 +21,14 @@ export class Users {
   @Column({ nullable: true })
   last_name?: string;
 
+  @Column({ nullable: true, enum: GenderEnum })
+  gender: GenderEnum;
+
+  @Column({ nullable: true, type: Date })
+  date_of_birth: Date;
+
   @Column({ nullable: true })
-  phone?: string;
+  address: string;
 
   @Column({ nullable: true })
   photo_url?: string;

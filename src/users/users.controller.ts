@@ -44,7 +44,7 @@ export class UsersController {
       throw new BadRequestException('Passwords donot match');
     }
 
-    const foundUser = await this.usersService.findOneUser(body.email);
+    const foundUser = await this.usersService.findOneUser(body.phone);
 
     if (foundUser) {
       throw new BadRequestException('User already exists');
@@ -53,7 +53,7 @@ export class UsersController {
     body.password = await this.usersService.hashPassword(body.password);
     const user = await this.usersService.createUser(body);
 
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email, phone: user.phone };
     const accessToken = this.jwtService.sign(payload);
 
     return successResponse(accessToken, 'User registered successfully!');
@@ -63,17 +63,17 @@ export class UsersController {
   @Post('/login')
   @ApiOperation({ summary: 'Login with credentials' })
   async login(@Body() body: LoginUserDto) {
-    const user = await this.usersService.getUserWithPassword(body.email);
+    const user = await this.usersService.getUserWithPassword(body.phone);
     if (!user) {
-      throw new UnauthorizedException('Invalid email or password!');
+      throw new UnauthorizedException('Invalid phone or password!');
     }
     const isPasswordValid = await bcrypt.compare(body.password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid phone or password');
     }
 
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, phone: user.phone, email: user.email };
     const accessToken = this.jwtService.sign(payload);
 
     return successResponse(accessToken, 'User logged in successfully!');
@@ -85,7 +85,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get user profile' })
   @ApiBearerAuth()
   async getProfile(@Req() request: AuthRequest) {
-    const user = await this.usersService.findOneUser(request.user.email);
+    const user = await this.usersService.findOneUser(request.user.phone);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -128,7 +128,7 @@ export class UsersController {
 
     const filename = `/profile-pictures/${picture.filename}`;
     const user = await this.usersService.updateProfilePicture(
-      request.user.email,
+      request.user.phone,
       filename,
     );
 
@@ -145,7 +145,7 @@ export class UsersController {
     @Body() userDto: UpdateUserDto,
   ) {
     const updatedUser = await this.usersService.updateUser(
-      request.user.email,
+      request.user.phone,
       userDto,
     );
 
