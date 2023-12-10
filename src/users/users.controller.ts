@@ -53,10 +53,7 @@ export class UsersController {
     body.password = await this.usersService.hashPassword(body.password);
     const user = await this.usersService.createUser(body);
 
-    const payload = { id: user.id, email: user.email, phone: user.phone };
-    const accessToken = this.jwtService.sign(payload);
-
-    return successResponse(accessToken, 'User registered successfully!');
+    return successResponse(user, 'User registered successfully!');
   }
 
   @HttpCode(HttpStatus.OK)
