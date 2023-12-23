@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Listing } from 'src/listings/entities/listing.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { GenderEnum } from '../enums';
 
 @Entity()
@@ -32,4 +33,7 @@ export class Users {
 
   @Column({ nullable: true })
   photo_url?: string;
+
+  @OneToMany(() => Listing, (listing) => listing.user)
+  listings: Listing[];
 }
