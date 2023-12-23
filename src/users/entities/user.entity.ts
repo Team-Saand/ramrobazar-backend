@@ -1,5 +1,5 @@
-import { Listing } from 'src/listings/entities/listing.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Listing } from '../../listings/entities';
 import { GenderEnum } from '../enums';
 
 @Entity()

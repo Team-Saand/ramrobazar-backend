@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryDto, ListingDto, UpdateListingDto } from './dto';
-import { Category, Listing } from './entities';
-import { ListingImage } from './entities/listingImage.entity';
+import { Category, Listing, ListingImage } from './entities';
 
 @Injectable()
 export class ListingsService {
@@ -19,6 +18,14 @@ export class ListingsService {
   async getAllListings(): Promise<Listing[]> {
     return this.listingRepository.find({
       relations: ['category', 'user', 'images'],
+      select: {
+        user: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          photo_url: true,
+        },
+      },
     });
   }
 
@@ -28,6 +35,14 @@ export class ListingsService {
         id,
       },
       relations: ['category', 'user', 'images'],
+      select: {
+        user: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          photo_url: true,
+        },
+      },
     });
 
     if (!listing) {
@@ -85,11 +100,16 @@ export class ListingsService {
   async updateListing(id: number, body: UpdateListingDto, userId: number) {
     const listing = await this.getOwnListing(id, userId);
 
+    const { categoryId, ...rest } = body;
+
     if (!listing) {
       return false;
     }
 
-    await this.listingRepository.update({ id }, body);
+    await this.listingRepository.update(
+      { id },
+      { ...rest, category: { id: categoryId || listing.category.id } },
+    );
 
     return this.getOneListing(id);
   }
