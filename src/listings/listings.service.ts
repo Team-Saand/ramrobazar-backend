@@ -2,19 +2,35 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Repository } from 'typeorm';
-import { CategoryDto, ListingDto, UpdateListingDto } from './dto';
-import { Category, Listing, ListingImage } from './entities';
+import { ILike, Repository } from 'typeorm';
+import { ListingDto, UpdateListingDto } from './dto';
+import { Listing, ListingImage } from './entities';
 @Injectable()
 export class ListingsService {
   constructor(
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
     @InjectRepository(ListingImage)
     private readonly listingImageRepository: Repository<ListingImage>,
   ) {}
+
+  async searchListings(query: string = '') {
+    return this.listingRepository.find({
+      where: query ? { name: ILike(`%${query}%`) } : {},
+      relations: ['category', 'user', 'images'],
+      select: {
+        user: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          photo_url: true,
+        },
+      },
+      order: {
+        id: 'ASC',
+      },
+    });
+  }
 
   async getOneListing(id: number): Promise<false | Listing> {
     const listing = await this.listingRepository.findOne({
@@ -29,6 +45,9 @@ export class ListingsService {
           last_name: true,
           photo_url: true,
         },
+      },
+      order: {
+        id: 'ASC',
       },
     });
 
@@ -46,6 +65,9 @@ export class ListingsService {
         user: { id: userId },
       },
       relations: ['category', 'user', 'images'],
+      order: {
+        id: 'ASC',
+      },
     });
 
     if (!listing) {
@@ -139,70 +161,5 @@ export class ListingsService {
         },
       },
     });
-  }
-
-  async searchListings(query: string = '') {
-    const querybuilder = this.listingRepository
-      .createQueryBuilder('listing')
-      .leftJoinAndSelect('listing.category', 'category')
-      .leftJoinAndSelect('listing.user', 'user')
-      .leftJoinAndSelect('listing.images', 'images');
-    if (query) {
-      querybuilder.where('listing.name ILIKE :query', { query: `%${query}%` });
-    }
-
-    return querybuilder.getMany();
-  }
-
-  // Categories
-  async getAllCategories(): Promise<Category[]> {
-    return this.categoryRepository.find();
-  }
-
-  async getOneCategory(id: number) {
-    const category = await this.categoryRepository.findOne({
-      where: {
-        id,
-      },
-      relations: ['listings'],
-    });
-
-    if (!category) {
-      return false;
-    }
-
-    return category;
-  }
-
-  async createCategory(body: CategoryDto) {
-    const category = this.categoryRepository.create(body);
-
-    await this.categoryRepository.save(category);
-
-    return this.getOneCategory(category.id);
-  }
-
-  async updateCategory(id: number, body: CategoryDto) {
-    const category = await this.getOneCategory(id);
-
-    if (!category) {
-      return false;
-    }
-
-    await this.categoryRepository.update({ id }, body);
-
-    return this.getOneCategory(id);
-  }
-
-  async deleteCategory(id: number) {
-    const category = await this.getOneCategory(id);
-
-    if (!category) {
-      return false;
-    }
-
-    await this.categoryRepository.delete({ id });
-
-    return true;
   }
 }

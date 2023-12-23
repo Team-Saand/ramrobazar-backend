@@ -4,14 +4,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from '../users/entities';
 import { UsersService } from '../users/users.service';
-import { Listing } from './entities';
-import { ListingImage } from './entities/listingImage.entity';
-import { ListingsController } from './listings.controller';
-import { ListingsService } from './listings.service';
+import { CategoriesController } from './categories.controller';
+import { CategoriesService } from './categories.service';
+import { Category } from './entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Listing, ListingImage, Users]),
+    TypeOrmModule.forFeature([Category, Users]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -21,7 +20,7 @@ import { ListingsService } from './listings.service';
       }),
     }),
   ],
-  controllers: [ListingsController],
-  providers: [ListingsService, UsersService],
+  controllers: [CategoriesController],
+  providers: [CategoriesService, UsersService],
 })
-export class ListingsModule {}
+export class CategoriesModule {}

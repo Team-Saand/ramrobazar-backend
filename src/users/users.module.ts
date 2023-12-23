@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entities';
+import { AuthGuard } from './guard';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
@@ -19,6 +20,7 @@ import { UsersService } from './users.service';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, AuthGuard],
+  exports: [AuthGuard],
 })
 export class UsersModule {}

@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Category } from '../../categories/entities';
 import { Users } from '../../users/entities';
-import { Category } from './category.entity';
 import { ListingImage } from './listingImage.entity';
 
 @Entity()

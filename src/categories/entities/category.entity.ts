@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Listing } from './listing.entity';
+import { Listing } from '../../listings/entities';
 
 @Entity()
 export class Category {

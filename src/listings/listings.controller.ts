@@ -16,7 +16,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { AuthGuard } from 'src/users/guard';
@@ -25,7 +25,7 @@ import { successResponse } from 'src/utils';
 import { ListingDto, QueryDto, UpdateListingDto } from './dto';
 import { ListingsService } from './listings.service';
 
-@ApiTags('Listings & Categories')
+@ApiTags('Listings')
 @Controller('listings')
 export class ListingsController {
   constructor(private readonly listingsService: ListingsService) {}
@@ -34,6 +34,7 @@ export class ListingsController {
   @Get('/all')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get all listings' })
   async getAllListings(@Query() params: QueryDto) {
     const data = await this.listingsService.searchListings(params.name);
 
@@ -46,33 +47,10 @@ export class ListingsController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('/categories')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard)
-  async getAllCategories() {
-    const categories = await this.listingsService.getAllCategories();
-
-    return successResponse(categories, 'Categories fetched successfully!');
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Get('/categories/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard)
-  async getOneCategory(@Param('id') id: number) {
-    const category = await this.listingsService.getOneCategory(id);
-
-    if (!category) {
-      throw new BadRequestException('Category not found');
-    }
-
-    return successResponse(category, 'Category fetched successfully!');
-  }
-
-  @HttpCode(HttpStatus.OK)
   @Get('/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get one listing' })
   async getOneListing(@Param('id') id: number) {
     const listing = await this.listingsService.getOneListing(id);
     if (!listing) {
@@ -102,6 +80,7 @@ export class ListingsController {
       }),
     }),
   )
+  @ApiOperation({ summary: 'Create a listing' })
   async createListing(
     @Body() body: ListingDto,
     @UploadedFiles() images: Express.Multer.File[],
@@ -128,6 +107,7 @@ export class ListingsController {
   @Put('/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update a listing' })
   async updateListing(
     @Param('id') id: number,
     @Body() body: UpdateListingDto,
@@ -153,6 +133,7 @@ export class ListingsController {
   @Delete('/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Delete a listing' })
   async deleteListing(
     @Param('id') id: number,
     @Request() request: AuthRequest,
@@ -166,6 +147,6 @@ export class ListingsController {
       throw new BadRequestException('Listing not found');
     }
 
-    return successResponse({}, 'Listing deleted successfully!');
+    return successResponse(true, 'Listing deleted successfully!');
   }
 }
