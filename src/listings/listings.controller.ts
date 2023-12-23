@@ -106,7 +106,6 @@ export class ListingsController {
     @UploadedFiles() images: Express.Multer.File[],
     @Request() request: AuthRequest,
   ) {
-    console.log(images);
     if (images.length === 0) {
       throw new BadRequestException('Images not provided');
     }
@@ -143,7 +142,10 @@ export class ListingsController {
       throw new BadRequestException('Listing not found');
     }
 
-    return successResponse(listing, 'Listing updated successfully!');
+    return successResponse(
+      { ...listing, images: listing.getImageUrls() },
+      'Listing updated successfully!',
+    );
   }
 
   @HttpCode(HttpStatus.OK)
