@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Repository } from 'typeorm';
 import { CategoryDto, ListingDto, UpdateListingDto } from './dto';
 import { Category, Listing, ListingImage } from './entities';
-
 @Injectable()
 export class ListingsService {
   constructor(
@@ -14,20 +15,6 @@ export class ListingsService {
     @InjectRepository(ListingImage)
     private readonly listingImageRepository: Repository<ListingImage>,
   ) {}
-
-  async getAllListings(): Promise<Listing[]> {
-    return this.listingRepository.find({
-      relations: ['category', 'user', 'images'],
-      select: {
-        user: {
-          id: true,
-          first_name: true,
-          last_name: true,
-          photo_url: true,
-        },
-      },
-    });
-  }
 
   async getOneListing(id: number): Promise<false | Listing> {
     const listing = await this.listingRepository.findOne({
@@ -121,11 +108,53 @@ export class ListingsService {
       return false;
     }
 
+    try {
+      const publicFolder = path.join(__dirname, '..', '..', 'public');
+      listing.images.forEach((image) => {
+        fs.unlinkSync(path.join(publicFolder, 'listings', image.fileName));
+      });
+    } catch (error) {
+      console.error('Error deleting file');
+    }
+
     await this.listingRepository.delete({ id });
 
     return true;
   }
 
+  async getListingByCategory(categoryId: number) {
+    return this.listingRepository.find({
+      where: {
+        category: {
+          id: categoryId,
+        },
+      },
+      relations: ['category', 'user', 'images'],
+      select: {
+        user: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          photo_url: true,
+        },
+      },
+    });
+  }
+
+  async searchListings(query: string = '') {
+    const querybuilder = this.listingRepository
+      .createQueryBuilder('listing')
+      .leftJoinAndSelect('listing.category', 'category')
+      .leftJoinAndSelect('listing.user', 'user')
+      .leftJoinAndSelect('listing.images', 'images');
+    if (query) {
+      querybuilder.where('listing.name ILIKE :query', { query: `%${query}%` });
+    }
+
+    return querybuilder.getMany();
+  }
+
+  // Categories
   async getAllCategories(): Promise<Category[]> {
     return this.categoryRepository.find();
   }

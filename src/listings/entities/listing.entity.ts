@@ -37,10 +37,14 @@ export class Listing {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updated_at: Date;
 
-  @ManyToOne(() => Category, (category) => category.listings)
+  @ManyToOne(() => Category, (category) => category.listings, {
+    onDelete: 'SET NULL',
+  })
   category: Category;
 
-  @OneToMany(() => ListingImage, (image) => image.listing)
+  @OneToMany(() => ListingImage, (image) => image.listing, {
+    onDelete: 'SET NULL',
+  })
   images: ListingImage[];
 
   @ManyToOne(() => Users, (user) => user.listings)

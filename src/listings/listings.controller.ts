@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UploadedFiles,
   UseGuards,
@@ -21,7 +22,7 @@ import * as path from 'path';
 import { AuthGuard } from 'src/users/guard';
 import { AuthRequest } from 'src/users/types';
 import { successResponse } from 'src/utils';
-import { ListingDto, UpdateListingDto } from './dto';
+import { ListingDto, QueryDto, UpdateListingDto } from './dto';
 import { ListingsService } from './listings.service';
 
 @ApiTags('Listings & Categories')
@@ -33,8 +34,8 @@ export class ListingsController {
   @Get('/all')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  async getAllListings() {
-    const data = await this.listingsService.getAllListings();
+  async getAllListings(@Query() params: QueryDto) {
+    const data = await this.listingsService.searchListings(params.name);
 
     const listings = data.map((listing) => ({
       ...listing,

@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { GlobalExceptionFilter } from './filters';
 import { ListingsModule } from './listings/listings.module';
-import { ReviewsModule } from './reviews/reviews.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -28,7 +27,6 @@ import { UsersModule } from './users/users.module';
     DatabaseModule,
     UsersModule,
     ListingsModule,
-    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [
