@@ -39,8 +39,8 @@ export class UsersController {
   @Post('/register')
   @ApiOperation({ summary: 'Register an account' })
   async register(@Body() body: CreateUserDto) {
-    if (body.password !== body.confirm_password) {
-      throw new BadRequestException('Passwords donot match');
+       if (body.password.length < 7) {
+      throw new BadRequestException('Passwords length shorter than 7');
     }
 
     const foundUser = await this.usersService.findOneUser(body.phone);
