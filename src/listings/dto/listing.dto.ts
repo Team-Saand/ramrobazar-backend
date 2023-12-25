@@ -15,7 +15,6 @@ export class ListingDto {
   @ApiProperty({ description: 'Listing description' })
   description: string;
 
-  @IsNotEmpty()
   @ApiProperty({ description: 'Listing category id' })
   categoryId: number;
 
