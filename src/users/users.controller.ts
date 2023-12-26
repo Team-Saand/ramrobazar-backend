@@ -39,7 +39,7 @@ export class UsersController {
   @Post('/register')
   @ApiOperation({ summary: 'Register an account' })
   async register(@Body() body: CreateUserDto) {
-       if (body.password.length < 7) {
+    if (body.password.length < 7) {
       throw new BadRequestException('Passwords length shorter than 7');
     }
 
