@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './entities';
-import { AuthGuard } from './guard';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { Users } from '../users/entities';
+import { UsersService } from '../users/users.service';
+import { Listing } from './entities';
+import { ListingImage } from './entities/listingImage.entity';
+import { ListingsController } from './listings.controller';
+import { ListingsService } from './listings.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Listing, ListingImage, Users]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -19,8 +21,7 @@ import { UsersService } from './users.service';
       }),
     }),
   ],
-  controllers: [UsersController],
-  providers: [UsersService, AuthGuard],
-  exports: [AuthGuard],
+  controllers: [ListingsController],
+  providers: [ListingsService, UsersService],
 })
-export class UsersModule {}
+export class ListingsModule {}

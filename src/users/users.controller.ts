@@ -18,7 +18,6 @@ import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcryptjs';
-import { Request } from 'express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { successResponse } from '../utils';
@@ -39,9 +38,9 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   @Post('/register')
   @ApiOperation({ summary: 'Register an account' })
-  async register(@Body() body: CreateUserDto, @Req() request: Request) {
-    if (body.password !== body.confirm_password) {
-      throw new BadRequestException('Passwords donot match');
+  async register(@Body() body: CreateUserDto) {
+       if (body.password.length < 7) {
+      throw new BadRequestException('Passwords length shorter than 7');
     }
 
     const foundUser = await this.usersService.findOneUser(body.phone);

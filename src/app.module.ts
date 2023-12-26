@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CategoriesModule } from './categories/categories.module';
 import { DatabaseModule } from './database/database.module';
 import { GlobalExceptionFilter } from './filters';
-import { ProductsModule } from './products/products.module';
+import { ListingsModule } from './listings/listings.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -26,15 +25,16 @@ import { UsersModule } from './users/users.module';
     }),
     DatabaseModule,
     UsersModule,
-    ProductsModule,
+    ListingsModule,
+    CategoriesModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
     },
   ],
+  exports: [JwtModule],
 })
 export class AppModule {}

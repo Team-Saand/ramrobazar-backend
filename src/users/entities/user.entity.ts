@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Listing } from '../../listings/entities';
 import { GenderEnum } from '../enums';
 
 @Entity()
@@ -6,7 +7,7 @@ export class Users {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: true, nullable: true })
   email: string;
 
   @Column({ nullable: false, unique: true })
@@ -32,4 +33,7 @@ export class Users {
 
   @Column({ nullable: true })
   photo_url?: string;
+
+  @OneToMany(() => Listing, (listing) => listing.user)
+  listings: Listing[];
 }
